@@ -1,0 +1,16 @@
+
+ @change="v=>checkId(v)"
+
+  checkId(v) {
+      console.log(v.bId);
+    }
+
+    chang image
+          // for (
+      //   let index = 0;
+      //   index < this.$refs.fileinputTwo.files.length;
+      //   index++
+      // ) {
+      //   this.lilstImage.push(this.$refs.fileinputTwo.files[index]);
+      // }
+      // this.$emit("photo_two", this.lilstImage);

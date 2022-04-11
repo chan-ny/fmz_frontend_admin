@@ -1,0 +1,15 @@
+<v-btn color="primary" @click="snackbar = true">
+      Open Snackbar
+    </v-btn>
+
+    <v-snackbar color="success" :timeout="1000" v-model="snackbar" top="top">
+      {{ text }}
+
+      <template v-slot:action="{ attrs }">
+        <v-btn  text v-bind="attrs" @click="snackbar = false">
+          Close
+        </v-btn>
+      </template>
+    </v-snackbar>
+
+  </div>

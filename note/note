@@ -1,0 +1,82 @@
+ this.$v.$touch();
+      if (this.$v.$invalid) {
+        console.log("error");
+      } else {
+        if (this.brandStatus == "true") {
+          this.arrayBrand.bstatus = 1;
+        } else {
+          this.arrayBrand.bstatus = 0;
+        }
+
+      }
+
+        setTimeout(function() {
+          alert("Hello");
+        }, 3000);
+
+        showAlert(title, msg, even) {
+      this.$swal(title, msg, even);
+    },
+
+    <template v-slot:group.header="{ group, headers, toggle, isOpen }">
+          <td :colspan="headers.length">
+            <v-btn @click="toggle" small icon :ref="group" :data-open="isOpen">
+              <v-icon v-if="isOpen">mdi-chevron-up</v-icon>
+              <v-icon v-else>mdi-chevron-down</v-icon>
+            </v-btn>
+            <b style="color:blue">
+              ເລກບິນ: <b style="color:red">{{ group }}</b>
+            </b>
+          </td>
+    </template>
+
+        <template v-slot:item.pdId="{ item }">
+              <span class="indigo--text">{{ item.pdId }}</span>
+      </template>
+
+      <template v-slot:item.imlprice="{ item }">
+              <span class="indigo--text">{{
+                new Intl.NumberFormat().format(item.imlprice)
+              }}</span>
+      </template>
+
+
+
+pdf
+      <template>
+  <div>
+    <div id="pdf" class="ma-3">
+      <div>Reporting</div>
+      <div>ຈັນນີ້</div>
+    </div>
+    <v-btn class="ma-3" color="success" @click="genneratepdf">pdf</v-btn>
+  </div>
+</template>
+<script>
+import html2pdf from "html2pdf.js";
+export default {
+  methods: {
+    genneratepdf() {
+      var element = document.getElementById("pdf");
+      var opt = {
+        margin: 1,
+        filename: "myfile.pdf",
+        image: { type: "jpeg", quality: 0.98 },
+        pagebreak: { mode: ["avoid-all", "css", "legacy"] },
+        html2canvas: { scale: 2 },
+        jsPDF: { unit: "in", format: "A4", orientation: "portrait" }
+      };
+
+      // New Promise-based usage:
+      html2pdf()
+        .set(opt)
+        .from(element)
+        .save();
+
+      // Old monolithic-style usage:
+      html2pdf(element, opt);
+    }
+  }
+};
+</script>
+<style></style>

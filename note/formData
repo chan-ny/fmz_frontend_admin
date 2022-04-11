@@ -1,0 +1,20 @@
+ // let formData = new FormData();
+      // formData.append("pdphotos_main", item.pdphotos_main);
+      // formData.append("pdphotos_sub", item.pdphotos_sub);
+
+
+      // formData.append("brand_Id" , this.BrandName.bId);
+      // formData.append("categories_Id" , this.CategoriesName.ctId);
+      // formData.append("colour_Id" , this.ColourName.cId);
+      // formData.append("size_Id" , this.SizeName.sId);
+      // formData.append("supplier_Id" , this.SupplierName.supId);
+      // formData.append("pdname" , this.pdName);
+      // formData.append("pdfullname" , this.pdFullname);
+      // formData.append("pdcost" , this.pdCost);
+      // formData.append("pdrate" , this.pdRate);
+      // formData.append("pdselling" , this.pdSelling);
+      // formData.append("pdqty" , this.pdQty);
+      // formData.append("pdprogression" , this.pdProgression);
+      // formData.append("pdphotos_main", this.photos_main);
+      // formData.append("pdphotos_sub" , this.photos_sub);
+      // this.$emit("addproduct",formData);

@@ -1,0 +1,78 @@
+
+ <v-data-table :headers="headers" :items="desserts" class="elevation-1">
+        <template v-slot:item.calories="{ item }" left>
+            
+          <v-list-item> 
+            <v-list-item-avatar tile>
+              <v-img
+                aspect-ratio="1"
+                :src="item.calories"
+                max-height="50"
+                max-width="100"
+                class="ma-2"
+              ></v-img>
+            </v-list-item-avatar>
+            <v-list-item-content>
+              <v-list-item-title v-text="item.fat"></v-list-item-title>
+              <v-list-item-subtitle v-text="item.carbs"></v-list-item-subtitle>
+            </v-list-item-content>
+          </v-list-item>
+        </template>
+
+        <template v-slot:item.active="{item}">
+        <v-btn color="success" @click="getfirst(item)">ok</v-btn>
+        </template>
+      </v-data-table>
+
+       headers: [
+        {
+          text: "Dessert (100g serving)",
+          align: "start",
+          sortable: false,
+          value: "name",
+          width: "300px"
+        },
+        { text: "Calories", value: "calories" },
+        { text: "Protein (g)", value: "protein" },
+        // { text: "Iron (%)", value: "iron" },
+        { text: "Active", value: "active",sortable: false},
+
+      ],
+      desserts: [
+        {
+          name: "Frozen Yogurt",
+          calories: "https://cdn.vuetifyjs.com/images/parallax/material2.jpg",
+          fat: 6.0,
+          carbs: 24,
+          protein: 4.0,
+          iron: "1%"
+        },
+        {
+          name: "Ice cream sandwich",
+          calories: "https://cdn.vuetifyjs.com/images/parallax/material2.jpg",
+          fat: 9.0,
+          carbs: 37,
+          protein: 4.3,
+          iron: "1%"
+        },
+        {
+          name: "Eclair",
+          calories: "https://cdn.vuetifyjs.com/images/parallax/material2.jpg",
+          fat: 16.0,
+          carbs: 23,
+          protein: 6.0,
+          iron: "7%"
+        }
+      ]
+    };
+  },
+  methods: {
+    getColor(calories) {
+      if (calories > 400) return "red";
+      else if (calories > 200) return "orange";
+      else return "green";
+    },
+    getfirst(item){
+        console.log(item.iron);
+    }
+  }

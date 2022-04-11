@@ -1,0 +1,48 @@
+
+ //format columns
+    formatStatusIcon(bstatus) {
+      ///for icon
+      if (bstatus > 0) {
+        return "mdi-sync";
+      } else {
+        return "mdi-sync-off";
+      }
+    },
+    formatStatusColor(bstatus) {
+      ///for color
+      if (bstatus > 0) {
+        return "green";
+      } else {
+        return "red";
+      }
+    },
+    formatId(bId) {
+      ///for Id
+      if (bId > 0) {
+        return "mdi-format-bold";
+      }
+    }
+
+    comtinue
+     <!-- format bstatus -->
+          <template v-slot:item.bstatus="{ item }">
+            <v-chip
+              class="pr-5"
+              dark
+              :close-icon="formatStatusIcon(item.bstatus)"
+              :color="formatStatusColor(item.bstatus)"
+              label
+              close
+            >
+            </v-chip>
+          </template>
+
+          <!-- format brandId -->
+          <template v-slot:item.bId="{ item }">
+            <v-chip class="pl-1">
+              <v-icon>
+                mdi-format-bold
+              </v-icon>
+              {{ item.bId }}
+            </v-chip>
+          </template>

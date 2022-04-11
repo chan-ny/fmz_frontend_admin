@@ -1,0 +1,354 @@
+<template lang="">
+  <div>
+    <v-card class="ma-3">
+      <v-card-title class="font-weight-bold">
+        <h2>ຂະໜາດສິນຄ້າ</h2>
+        <v-spacer></v-spacer>
+        <v-spacer></v-spacer>
+
+        <!-- text search -->
+        <v-text-field
+        v-model="search"
+          label="ຄົ້ນຫາຂະໜາດສິນຄ້າ ...."
+          id="search"
+          class="font-weight-light"
+          append-icon="mdi-magnify"
+        ></v-text-field>
+      </v-card-title>
+      <v-card-subtitle>
+        ຈຳນວນ <strong>{{ maxId }}</strong> ລາຍການ
+      </v-card-subtitle>
+
+      <!-- table -->
+      <v-card class="ma-2">
+        <v-data-table
+          :headers="headcolumns"
+          :items="sizes.data"
+          :items-per-page="5"
+          :search="search"
+          class="elevation-1"
+        >
+          <template v-slot:top>
+            <v-toolbar flat>
+              <v-dialog
+                v-model="dialogfrom"
+                scrollable
+                persistent
+                :overlay="false"
+                max-width="400px"
+              >
+                <!-- point add -->
+                <template v-slot:activator="{ on, attrs }">
+                  <v-btn
+                    color="success"
+                    v-bind="attrs"
+                    v-on="on"
+                    dark
+                    tile
+                    elevation="5"
+                    >ເພີ່ມຂະໜາດສິນຄ້າ</v-btn
+                  >
+                </template>
+
+                <!-- tilte point add and edit -->
+                <v-card>
+                  <v-card-title>
+                    <span class="headline">
+                      <div class="font">{{ formatTitle }}</div>
+                    </span>
+                  </v-card-title>
+                  <v-divider></v-divider>
+
+                  <!-- from data -->
+                  <v-card-text>
+                    <v-container>
+                      <Form model="POST">
+                        <div>
+                          <v-text-field
+                            v-model="sizeId"
+                            :error-messages="sizesIdError"
+                            :counter="5"
+                            required
+                            label="ລະຫັດຂະໜາດ"
+                            id="id"
+                            @input="$v.sizeId.$touch()"
+                            @blur="$v.sizeId.$touch()"
+                          ></v-text-field>
+                          <v-text-field
+                            v-model="sizeName"
+                            :error-messages="sizesNameError"
+                            :counter="15"
+                            required
+                            label="ຊື່ຂະໜາດສິນຄ້າ"
+                            @input="$v.sizeName.$touch()"
+                            @blur="$v.sizeName.$touch()"
+                          ></v-text-field>
+                          <v-textarea
+                            v-model="sizeDetail"
+                            :error-messages="sizesDetailError"
+                            required
+                            label="ລາຍລະອຽດ"
+                            @input="$v.sizeDetail.$touch()"
+                            @blur="$v.sizeDetail.$touch()"
+                            outlined
+                          ></v-textarea>
+                          <v-select
+                            v-model="sizeStatus"
+                            :items="item"
+                            :error-messages="sizesStatusError"
+                            required
+                            label="ສະຖານະເຮັດວຽກ"
+                            @input="$v.sizeStatus.$touch()"
+                            @blur="$v.sizeStatus.$touch()"
+                          ></v-select>
+                        </div>
+                      </Form>
+                    </v-container>
+                  </v-card-text>
+                  <v-card-actions>
+                    <v-spacer></v-spacer>
+                    <div class="mr-2">
+                      <v-btn color="warning darken-1" @click="closeDialog"
+                        >ຍົກເລີກ</v-btn
+                      >
+                    </div>
+
+                    <div v-if="selectIndex == -1">
+                      <v-btn color="green darken-1" dark @click="craateSize">
+                        ບັນທຶກ
+                      </v-btn>
+                    </div>
+                    <div v-else>
+                      <v-btn color="green darken-1" dark>
+                        ປ່ຽນແປ່ງ
+                      </v-btn>
+                    </div>
+                  </v-card-actions>
+                </v-card>
+              </v-dialog>
+
+              <!-- dialog delete -->
+              <v-dialog v-model="dialogDelete" max-width="450px" persistent>
+                <v-card>
+                  <v-card-title class="headline"
+                    ><b class="font"
+                      >ເຈົ້າຕ້ອງການທີ່ຈະລືບຂໍ້ມູນແບຣນຫຼືບໍ? ID = {{ sizeId }}
+                    </b></v-card-title
+                  >
+                  <v-card-actions>
+                    <v-spacer></v-spacer>
+                    <v-btn
+                      color="red darken-1 "
+                      text
+                      @click="dialogDelete = !dialogDelete"
+                      >ຍົກເລີກ</v-btn
+                    >
+                    <v-btn color="blue darken-1" text
+                      >ຕົກລົງ</v-btn
+                    >
+                    <v-spacer></v-spacer>
+                  </v-card-actions>
+                </v-card>
+              </v-dialog>
+            </v-toolbar>
+          </template>
+
+          <!-- format date -->
+          <template v-slot:item.created_at="{ item }">
+            <span>{{ new Date(item.created_at).toLocaleString() }}</span>
+          </template>
+          <template v-slot:item.updated_at="{ item }">
+            <span>{{ new Date(item.updated_at).toLocaleString() }}</span>
+          </template>
+
+          <!-- active function -->
+          <template v-slot:item.active="{ item }">
+            <v-icon medium class="mr-2 warning--text" @click="editItem(item)">
+              mdi-pencil
+            </v-icon>
+            <v-icon medium class="mr-2 red--text" @click="alertdelete(item)">
+              mdi-delete
+            </v-icon>
+          </template>
+        </v-data-table>
+      </v-card>
+    </v-card>
+  </div>
+</template>
+<script>
+import { validationMixin } from "vuelidate";
+import { required, maxLength, minLength } from "vuelidate/lib/validators";
+import SizeServiec from "@/service/SizeServies";
+export default {
+  //validation
+  mixins: [validationMixin],
+  validations: {
+    sizeId: { required, minLength: minLength(1), maxLength: maxLength(5) },
+    sizeName: { required, minLength: minLength(1), maxLength: maxLength(15) },
+    sizeDetail: { required, minLength: minLength(6) },
+    sizeStatus: { required, minLength: minLength(2), maxLength: maxLength(8) }
+  },
+
+  data() {
+    return {
+      search: "",
+      sizes: [],
+      maxId: 0,
+
+      headcolumns: [
+        { text: "ລະຫັດຂະໜາດ", align: "start", sortable: false, value: "sId" },
+        { text: "ຊື່ຂະໜາດ", value: "sname" },
+        { text: "ລາຍລະອຽດ", value: "sdetail" },
+        { text: "ສະຖານະການເຮັດວຽກ", value: "status" },
+        { text: "ວັນທີ່ສ້າງ", value: "created_at" },
+        { text: "ວັນທີ່ແກ້ໄຂ", value: "updated_at" },
+        { text: "Active", value: "active", sortable: false }
+      ],
+
+      //    data-binding
+      sizeId: "",
+      sizeName: "",
+      sizeDetail: "",
+      sizeStatus: "",
+      item: ["on", "off", "block"],
+
+      sizeData: {
+        sId: "",
+        sname: "",
+        sdetail: "",
+        status: ""
+      },
+
+      /// dialog from
+      dialogfrom: false,
+      dialogDelete: false,
+      selectIndex: -1
+    };
+  },
+  methods: {
+    // alert
+    showalert(title, msg, even) {
+      this.$swal(title, msg, even);
+    },
+    closeDialog() {
+      this.dialogfrom = false;
+    },
+    alertdelete(item){
+      this.dialogDelete = true;
+      this.sizeId = item.sId
+      // console.log(item)
+    },
+
+    // CRUD
+    async seriestable() {
+      try {
+        this.sizes = (await SizeServiec.index()).data;
+        this.maxId = this.sizes.MaxId;
+      } catch (error) {
+        this.showalert(
+          "ເກີດຂໍ້ມູນຜີດພາດ",
+          "ກະລຸນາປ້ອນຂໍ້ມູນໃຫມ່ກ່ອນແລ້ວລອງໄໝ່",
+          "error"
+        );
+      }
+    },
+
+    //create size
+    craateSize() {
+      // this.dialogfrom = false;
+
+      this.$v.$touch();
+      if (this.$v.$invalid) {
+        this.showalert(
+          "ເກີດຂໍ້ມູນຜີດພາດ",
+          "ກະລຸນາປ້ອນຂໍ້ມູນໃຫມ່ກ່ອນແລ້ວລອງໄໝ່",
+          "error"
+        );
+      } else {
+        (this.sizeData.sId = this.sizeId),
+          (this.sizeData.sname = this.sizeName),
+          (this.sizeData.sdetail = this.sizeDetail),
+          (this.sizeData.status = this.sizeStatus);
+        console.log(this.sizeData);
+      }
+    },
+
+    /// update size
+    editItem(item){
+      this.selectIndex = item.sid;
+      this.sizeId = item.sId;
+      this.sizeName = item.sname;
+      this.sizeDetail = item.sdetail;
+      this.sizeStatus = item.status;
+
+      this.dialogfrom = true
+    }
+  },
+  created() {
+    this.seriestable();
+  },
+  computed: {
+    // format title of add and edit
+    formatTitle() {
+      return this.selectIndex === -1 ? "ເພີ່ມຂະໜາດສິນຄ້າ" : "ແກ້ໄຂຂະໜາດສິນຄ້າ";
+    },
+
+    // validation
+    sizesIdError() {
+      const error = [];
+      if (!this.$v.sizeId.$dirty) return error;
+      !this.$v.sizeId.minLength &&
+        error.push("ໄອດີຂອງຂະໜາດສີນຄ້າຕ້ອງຫຼາຍກວ່າ 0 ຕົວອັກສອນ");
+      !this.$v.sizeId.maxLength &&
+        error.push("ໄອດີຂອງຂະໜາດສີນຄ້າຕ້ອງໃຫ່ຍສູດບໍ່ເກີນ 5 ຕົວອັກສອນ");
+      !this.$v.sizeId.required && error.push("ເພີ່ມຂໍ້ມູນໄອດີກ່ອນ");
+      return error;
+    },
+    sizesNameError() {
+      const error = [];
+      if (!this.$v.sizeName.$dirty) return error;
+      !this.$v.sizeName.minLength &&
+        error.push("ຂໍ້ມູນຂອງຂະໜາດສີນຄ້າຕ້ອງຫຼາຍກວ່າ 1 ຕົວອັກສອນ");
+      !this.$v.sizeName.maxLength &&
+        error.push("ຂໍ້ມູນຂອງຂະໜາດສີນຄ້າຕ້ອງໃຫ່ຍສູດບໍ່ເກີນ 15 ຕົວອັກສອນ");
+      !this.$v.sizeName.required && error.push("ເພີ່ມຂໍ້ມູນຊື່ຂະໜາດກ່ອນ");
+      return error;
+    },
+    sizesDetailError() {
+      const error = [];
+      if (!this.$v.sizeDetail.$dirty) return error;
+      !this.$v.sizeDetail.minLength &&
+        error.push("ຂໍ້ມູນຂອງລາຍລະອຽດສີນຄ້າຕ້ອງຫຼາຍກວ່າ 6 ຕົວອັກສອນ");
+      !this.$v.sizeDetail.required && error.push("ເພີ່ມຂໍ້ມູນລາຍລະອຽດກ່ອນ");
+      return error;
+    },
+    sizesStatusError() {
+      const error = [];
+      if (!this.$v.sizeStatus.$dirty) return error;
+      !this.$v.sizeStatus.minLength &&
+        error.push("ຂໍ້ມູນຂອງສະຖານະເຮັດວຽກຕ້ອງຫຼາຍກວ່າ 2 ຕົວອັກສອນ");
+      !this.$v.sizeStatus.maxLength &&
+        error.push("ຂໍ້ມູນຂອງສະຖານະເຮັດວຽກຕ້ອງໃຫ່ຍສູດບໍ່ເກີນ 8 ຕົວອັກສອນ");
+      !this.$v.sizeStatus.required &&
+        error.push("ເພີ່ມຂໍ້ມູນສະຖານະເຮັດວຽກກ່ອນ");
+      return error;
+    }
+  }
+};
+</script>
+<style lang=""></style>
+
+
+     button
+          <v-btn dark color="orange darken-2" @click="editItem(item)">
+              <v-icon medium>
+                mdi-pencil
+              </v-icon>
+              ແກ້ໄຂ</v-btn
+            >
+            <v-btn dark color="error" class="ml-2" @click="alertdelete(item)">
+              <v-icon medium>
+                mdi-delete
+              </v-icon>
+              ລືບ
+            </v-btn>
